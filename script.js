@@ -269,7 +269,7 @@ async function askBackend(message, mode) {
   aiState = "thinking"; // dashboard AI indicator
   refreshDashboard();
 
-  const res = await fetch("http://127.0.0.1:3000/api/ask", {
+  const API_URL = "https://jarvis-assistant-5sfo.onrender.com/api/ask";
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
