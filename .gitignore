@@ -1,0 +1,16 @@
+.env
+.env.*
+!.env.example
+node_modules/
+
+_tmp_*.js
+_tmp_*.log
+
+
+android/.gradle/
+android/app/build/
+android/build/
+.idea/
+*.apk
+*.aab
+

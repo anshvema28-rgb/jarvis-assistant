@@ -1,0 +1,17 @@
+{
+  "name": "jarvis-assistant",
+  "version": "1.0.0",
+  "private": true,
+  "description": "JARVIS voice assistant with Gemini conversation memory (zero dependencies)",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "test": "node test.js"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/cli": "^8.5.3",
+    "@capacitor/core": "^8.5.3"
+  }
+}

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JARVIS - AI Voice Assistant</title>
+  <link rel="stylesheet" href="style.css?v=2.3" />
+</head>
+<body>
+
+  <!-- Background effects -->
+  <div class="bg-grid"></div>
+  <div class="bg-glow"></div>
+
+  <div class="app">
+
+    <!-- Header -->
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-dot"></span>
+        <h1>J.A.R.V.I.S</h1>
+        <span class="tag">v1.0</span>
+      </div>
+      <div class="topbar-right">
+        <button
+          id="dashToggle"
+          class="btn-clear"
+          aria-expanded="true"
+          aria-controls="dashPanel"
+          title="Show or hide the Command Center"
+        >
+          DASH
+        </button>
+        <button id="clearBtn" class="btn-clear" title="Delete saved conversation history">
+          CLEAR CHAT
+        </button>
+        <div class="status" id="statusBar">
+          <span class="status-light"></span>
+          <span id="statusText">SYSTEM ONLINE</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Command Center dashboard -->
+    <section class="dash" id="dashPanel" aria-label="Command Center">
+      <div class="dash-head">
+        <h2 class="dash-title">COMMAND CENTER</h2>
+      </div>
+      <div class="dash-grid">
+
+        <!-- AI reactor core + voice waveform (pure CSS animation,
+             driven by the Hands-Free state - no microphone access) -->
+        <div class="dash-card dash-core">
+          <div class="dash-card-title">JARVIS CORE</div>
+          <div class="core-row">
+            <div class="reactor" id="reactorCore" data-state="off" aria-hidden="true">
+              <span class="ring ring-a"></span>
+              <span class="ring ring-b"></span>
+              <span class="core-dot"></span>
+            </div>
+            <div class="core-meter">
+              <div class="waveform" id="waveform" data-state="off" aria-hidden="true">
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+                <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+              </div>
+              <div class="core-state" id="coreState">STANDBY</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live local clock -->
+        <div class="dash-card dash-clock">
+          <div class="dash-card-title">LOCAL TIME</div>
+          <div class="clock-time" id="clockTime">--:--:--</div>
+          <div class="clock-date" id="clockDate">&nbsp;</div>
+        </div>
+
+        <!-- AI / API / Mic / Hands-Free indicators -->
+        <div class="dash-card">
+          <div class="dash-card-title">STATUS</div>
+          <ul class="status-list" id="dashStatus">
+            <li class="status-item" data-key="ai"><span class="dot on"></span><span class="k">AI</span><span class="v">READY</span></li>
+            <li class="status-item" data-key="api"><span class="dot idle"></span><span class="k">API</span><span class="v">STANDBY</span></li>
+            <li class="status-item" data-key="mic"><span class="dot idle"></span><span class="k">MIC</span><span class="v">IDLE</span></li>
+            <li class="status-item" data-key="handsfree"><span class="dot idle"></span><span class="k">HANDS-FREE</span><span class="v">OFF</span></li>
+          </ul>
+        </div>
+
+        <!-- Quick action buttons -->
+        <div class="dash-card">
+          <div class="dash-card-title">QUICK ACTIONS</div>
+          <div class="quick-grid" id="dashQuick">
+            <button type="button" class="chip" data-cmd="/time">/time</button>
+            <button type="button" class="chip" data-cmd="/date">/date</button>
+            <button type="button" class="chip" data-cmd="/help">/help</button>
+            <button type="button" class="chip" data-study="1">STUDY: OFF</button>
+            <button type="button" class="chip" data-action="quiz" title="Start a Class 9 quiz - asks for a subject">/quiz</button>
+            <button type="button" class="chip" data-action="revise" title="Start Class 9 revision - asks for a subject">/revise</button>
+          </div>
+        </div>
+
+        <!-- Website launcher (fixed HTTPS allowlist only) -->
+        <div class="dash-card">
+          <div class="dash-card-title">LAUNCHER</div>
+          <div class="launcher-grid" id="dashLauncher">
+            <button type="button" class="chip launch" data-site="google">Google</button>
+            <button type="button" class="chip launch" data-site="youtube">YouTube</button>
+            <button type="button" class="chip launch" data-site="instagram">Instagram</button>
+            <button type="button" class="chip launch" data-site="wikipedia">Wikipedia</button>
+          </div>
+        </div>
+
+        <!-- Recent activity (labels only, in-memory, capped) -->
+        <div class="dash-card">
+          <div class="dash-card-title">RECENT ACTIVITY</div>
+          <ul class="activity-list" id="dashActivity">
+            <li class="activity-empty">No activity yet</li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Chat area -->
+    <main class="chat-panel">
+      <div class="panel-corner tl"></div>
+      <div class="panel-corner tr"></div>
+      <div class="panel-corner bl"></div>
+      <div class="panel-corner br"></div>
+
+      <div class="chat-log" id="chatLog">
+        <div class="msg bot">
+          <div class="avatar">J</div>
+          <div class="bubble">
+            Boot sequence complete. Hello — I am JARVIS. Ask me anything by
+            typing, or press the microphone and speak.
+          </div>
+        </div>
+      </div>
+
+      <div class="typing" id="typing" hidden>
+        <span></span><span></span><span></span>
+      </div>
+    </main>
+
+    <!-- Controls -->
+    <footer class="controls">
+      <div class="handsfree-row">
+        <button
+          type="button"
+          id="handsFreeBtn"
+          class="btn-handsfree"
+          aria-pressed="false"
+          title="Hands-Free Voice Mode: JARVIS listens, answers by voice and listens again. Click STOP LISTENING at any time."
+        >
+          START LISTENING
+        </button>
+        <label
+          class="wake-label"
+          id="wakeWrap"
+          title="Only respond after you say 'Hey JARVIS' (or just 'Jarvis') first, then your command - one breath or two. Works only while this tab is visible and the device is unlocked."
+        >
+          <input type="checkbox" id="wakeWordChk" />
+          "Hey JARVIS" wake word
+        </label>
+      </div>
+
+      <form id="chatForm" class="chat-form" autocomplete="off">
+        <input
+          type="text"
+          id="userInput"
+          placeholder="Type your message here..."
+          maxlength="500"
+          aria-label="Message"
+        />
+        <button type="submit" id="sendBtn" class="btn btn-send" title="Send">
+          SEND
+        </button>
+        <button type="button" id="micBtn" class="btn btn-mic" title="Voice input">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path fill="currentColor"
+              d="M12 14a3 3 0 0 0 3-3V5a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/>
+          </svg>
+        </button>
+        <button type="button" id="ttsBtn" class="btn btn-tts active" title="Speak replies">
+          <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+            <path fill="currentColor"
+              d="M4 9v6h4l5 5V4L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z"/>
+          </svg>
+        </button>
+      </form>
+
+      <div class="hint" id="hint">
+        Mic works best in Chrome / Edge on Windows &middot; Voice replies can be
+        toggled with the speaker button &middot; Hands-free mode needs Chrome /
+        Edge with this tab kept visible &mdash; it pauses when the tab is
+        hidden or the device locks
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Version query strings defeat stale browser caches: an old state
+       machine served next to the new frontend used to break voice
+       auto-send (missing resolveWakeInput). Bump ?v= on every release. -->
+  <script src="commands.js?v=2.3"></script>
+  <script src="handsfree.js?v=2.3"></script>
+  <script src="dashboard.js?v=2.3"></script>
+  <script src="script.js?v=2.3"></script>
+</body>
+</html>
